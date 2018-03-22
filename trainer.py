@@ -57,7 +57,8 @@ for generation in tqdm.tqdm(range(total_generations)):
         copies = [copy.deepcopy(network) for _ in range(num_copies)]
         population.extend(copies)
 
-os.mkdir("log")
+if not os.path.exists("log"):
+    os.mkdir("log")
 for idx, (best_net, score) in enumerate(best):
     best_net.save(f'log/{idx}_score_{score}')
 
