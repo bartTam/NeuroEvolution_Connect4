@@ -45,8 +45,8 @@ class Network(object):
             layer.mutate(mutation_rate=mutation_rate)
         
     def save(self, location):
-        pickle.dump(self, open(location))
+        pickle.dump(self, open(location, 'wb'))
 
     @staticmethod
     def load(location):
-        return pickle.load(open(location))
+        return pickle.load(open(location, 'rb'))

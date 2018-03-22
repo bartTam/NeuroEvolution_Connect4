@@ -1,14 +1,16 @@
 from network import Network
 from connect_4 import Connect_4
+
+import os
 from itertools import combinations
 import numpy as np
 import copy 
 import tqdm
 
-total_generations = 100
-pop_size = 20
-mutation_rate = 0.1
-num_surviving = 5
+total_generations = 500
+pop_size = 100
+mutation_rate = 0.5
+num_surviving = 10
 
 def find_winner(population, scoreboard):
     def run(players):
@@ -55,8 +57,9 @@ for generation in tqdm.tqdm(range(total_generations)):
         copies = [copy.deepcopy(network) for _ in range(num_copies)]
         population.extend(copies)
 
-#for idx, (best_net, score) in enumerate(best):
-#    best_net.save(f'{idx}_score_{score}')
+os.mkdir("log")
+for idx, (best_net, score) in enumerate(best):
+    best_net.save(f'log/{idx}_score_{score}')
 
 print(best)
 game = Connect_4([lambda x: int(input()) - 1, best[0][0]], headless=True, printing=True)
