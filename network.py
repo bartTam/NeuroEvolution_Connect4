@@ -38,7 +38,7 @@ class Network(object):
 
     def __call__(self, x):
         x = self.forward(x)
-        return np.argmax(x)
+        return int(np.argmax(x))
 
     def mutate(self, mutation_rate=0.1):
         for layer in self.layers:

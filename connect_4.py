@@ -89,10 +89,12 @@ class _Connect_4_Gamestate(object):
     def run_game(self):
         for player, get_turn in self.interface:
             if self.turn_num == 41:
+                self.print("Cat's game")
                 return -1
             self.current_player = player
-            while not self.play_turn(get_turn(self.game_board)):
-                pass
+            if not self.play_turn(get_turn(self.game_board)):
+                self.print("Invalid play")
+                return -1
             self.interface.update_board(self.game_board)
             self.turn_num += 1
             if self.winner != -1:
@@ -105,6 +107,8 @@ class _Connect_4_Gamestate(object):
             print(*args, **kargs)
 
     def play_turn(self, column_num):
+        self.print(column_num, self.num_cols)
+        self.print(self.game_board)
         # Pass turn
         if column_num is None:
             return True
@@ -115,8 +119,10 @@ class _Connect_4_Gamestate(object):
                 column_num < 0:
             return False
 
+        self.print("is valid")
+
         # Play the piece
-        for row in range(self.num_rows - 1, -1, -1):
+        for row in reversed(range(self.num_rows)):
             if self.game_board[row, column_num] == -1:
                 self.game_board[row, column_num] = self.current_player
                 if self._check_win(row, column_num):
@@ -165,4 +171,4 @@ if __name__ == '__main__':
         return random.randint(0, 6)
     def human_callback(arg):
         return int(input()) - 1
-    Connect_4(inputCallback=[create_callback(2), create_callback(1)], headless=True, printing=True).run_game()
+    Connect_4(inputCallback=[human_callback, create_callback(1)], headless=True, printing=True).run_game()

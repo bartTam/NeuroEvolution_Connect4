@@ -51,12 +51,12 @@ for generation in tqdm.tqdm(range(total_generations)):
     total_score = sum([survivor[1] for survivor in best])
     for network, score in best:
         # Weigh the numbers of copies
-        num_copies = pop_size * (score / total_score)
+        num_copies = pop_size // num_surviving
         copies = [copy.deepcopy(network) for _ in range(num_copies)]
         population.extend(copies)
 
-for idx, (best_net, score) in enumerate(best):
-    best_net.save(f'{idx}_score_{score}')
+#for idx, (best_net, score) in enumerate(best):
+#    best_net.save(f'{idx}_score_{score}')
 
 print(best)
 game = Connect_4([lambda x: int(input()) - 1, best[0][0]], headless=True, printing=True)
