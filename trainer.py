@@ -7,9 +7,9 @@ import numpy as np
 import copy 
 import tqdm
 
-total_generations = 500
-pop_size = 100
-mutation_rate = 0.5
+total_generations = 1000
+pop_size = 50
+mutation_rate = 2
 num_surviving = 10
 
 def find_winner(population, scoreboard):
@@ -24,6 +24,9 @@ def find_winner(population, scoreboard):
     return run
 
 def rate(population):
+    '''
+    Find the scores of all the models
+    '''
     scoreboard = [0] * len(population)
 
     # All unique pairs of ai's
@@ -33,6 +36,9 @@ def rate(population):
     return scoreboard
 
 def find_n_best(scores, population, n):
+    '''
+    Get the best n models of the population
+    '''
     best = []
     for i in range(n):
         best_score_idx = np.argmax(scores)
@@ -43,8 +49,17 @@ def find_n_best(scores, population, n):
 population = [Network() for i in range(pop_size)]
 best = []
 
+# Iterate over all generations
 for generation in tqdm.tqdm(range(total_generations)):
+    
+    # Reduce mutation rate after 500 iterations
+    if generation == 500:
+        mutation_rate = mutation_rate / 2
+    
+    # Mutate all models
     list(map(lambda x: x.mutate(mutation_rate=mutation_rate), population))
+
+    # Score best models
     scores = rate(population)
     best = find_n_best(scores, population, num_surviving)
 
@@ -57,11 +72,12 @@ for generation in tqdm.tqdm(range(total_generations)):
         copies = [copy.deepcopy(network) for _ in range(num_copies)]
         population.extend(copies)
 
+# Save the best models
 if not os.path.exists("log"):
     os.mkdir("log")
 for idx, (best_net, score) in enumerate(best):
     best_net.save(f'log/{idx}_score_{score}')
 
-print(best)
-game = Connect_4([lambda x: int(input()) - 1, best[0][0]], headless=True, printing=True)
+# Play a game against it
+game = Connect_4([None, best[0][0]], headless=True, printing=True)
 winner = game.run_game()

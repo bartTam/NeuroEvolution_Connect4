@@ -25,23 +25,41 @@ class Connect_4(object):
         
 
 class _Interface():
-    ''' Default Interface that does not support player interaction '''
     def __init__(self, inputCallback, printing=True):
         self.inputCallback = inputCallback
         self.printing = printing
+        self._init_callback()
+
+    def _init_callback(self):
+        # Replace any "None" callbacks with human input
+        for callback in self.inputCallback:
+            if callback is None:
+                callback = lambda x: int(input()) - 1
 
     def __iter__(self):
+        '''
+        Determine the player and callback for each turn
+        '''
         player = 0
+
         while True:
             yield player, self.inputCallback[player]
             player = (player + 1) % 2
 
     def print(self, *args, **kargs):
+        '''
+        Disable printing if printing is turned off
+        '''
         if self.printing:
             print(*args, **kargs)
 
     def update_board(self, board):
+        '''
+        Update the visual of the board
+        '''
         print_output = {-1:'_', 0:'X', 1:'O'}
+
+        # Print each row
         self.print()
         for row in board:
             for value in row:
@@ -67,7 +85,16 @@ class _Pygame_GUI(_Interface):
         display.set_caption('Connect 4')
         self.window_size = display.get_surface().get_size()
 
+    def _init_callback(self):
+        '''
+        Replace any "None" callbacks with human input
+        '''
+        pass
+
     def update_board(self, board):
+        '''
+        Update the visual of the board
+        '''
         pass
 
 
@@ -75,28 +102,40 @@ class _Connect_4_Gamestate(object):
     default_game_board_size = (6,7)
 
     def __init__(self, interface, game_board_size=default_game_board_size, printing=True):
-        # Initialize board
         self.num_rows, self.num_cols = game_board_size # numpy is row major
+        # Initialize board to -1
         self.game_board = np.zeros(game_board_size) - 1
         self.game_moves = []
         self.current_player = 0
+        # The winner -1 until one player wins, 0 for first player, 1 for second player
         self.winner = -1
+
         self.interface = interface
         self.interface.update_board(self.game_board)
         self.printing = printing
         self.turn_num = 0
 
     def run_game(self):
+        '''
+        Play the entire game
+        '''
         for player, get_turn in self.interface:
-            if self.turn_num == 41:
+            # Ensure there is never a stalemate
+            if len(self.game_moves) == 41:
                 self.print("Cat's game")
                 return -1
+
             self.current_player = player
-            if not self.play_turn(get_turn(self.game_board)):
+            # Ensure there is not too many in a column
+            turn = get_turn(self.game_board)
+            if not self.play_turn(turn):
                 self.print("Invalid play")
                 return -1
+
+            # Successful so update the board
             self.interface.update_board(self.game_board)
-            self.turn_num += 1
+            self.game_moves.append(turn)
+
             if self.winner != -1:
                 break
         self.print(f'Player {self.winner + 1} Won!')
@@ -107,8 +146,6 @@ class _Connect_4_Gamestate(object):
             print(*args, **kargs)
 
     def play_turn(self, column_num):
-        self.print(column_num, self.num_cols)
-        self.print(self.game_board)
         # Pass turn
         if column_num is None:
             return True
@@ -118,8 +155,6 @@ class _Connect_4_Gamestate(object):
                 column_num >= self.num_cols or \
                 column_num < 0:
             return False
-
-        self.print("is valid")
 
         # Play the piece
         for row in reversed(range(self.num_rows)):
@@ -131,13 +166,16 @@ class _Connect_4_Gamestate(object):
         return False
             
     def _check_win(self, x, y):
+        # Check around the placed piece
         for curr_y in range(-1, 1):
             for curr_x in range(-1, 1):
+                # Don't check current place
                 if curr_y == 0 and curr_x == 0:
                     pass
                 else:
                     i = 1
                     check_out = check_in = True
+                    # Check up to 4 pieces away
                     for offset in range(1, 4):
                         if check_in:
                             to_check = x + offset * curr_x, y + offset * curr_y
@@ -169,6 +207,4 @@ if __name__ == '__main__':
     import random
     def rand_callback(arg):
         return random.randint(0, 6)
-    def human_callback(arg):
-        return int(input()) - 1
-    Connect_4(inputCallback=[human_callback, create_callback(1)], headless=True, printing=True).run_game()
+    Connect_4(inputCallback=[None, create_callback(1)], headless=True, printing=True).run_game()

@@ -9,44 +9,66 @@ class Layer(object):
         self.mutate(mutation_rate=1)
 
     def forward(self, x):
+        '''
+        Forward pass
+        '''
         x = np.matmul(self.weights, x)
         x = self.bias + x
         x = 1 / (1 + np.exp(-x))
         return x
 
-    def __call__(self, x):
-        return self.forward(x)
-
     def mutate(self, mutation_rate=0.1):
+        '''
+        Mutate the weights
+        '''
         for row in range(self.weights.shape[0]):
             for col in range(self.weights.shape[1]):
+                # Add a random amount to each weight
                 self.weights[row, col] += mutation_rate * uniform(-1, 1)
         for i in range(self.bias.shape[0]):
+            # Add a random amount to each bias
             self.bias[i] += mutation_rate * uniform(-1, 1)
         
     
 
 class Network(object):
     def __init__(self):
-        self.layers = [Layer(42, 20), Layer(20, 7)]
+        # The layers of the MLP
+        self.layers = [Layer(42, 35), Layer(35, 30), Layer(30, 25), Layer(25, 20), 
+                Layer(20, 15), Layer(15, 7)]
     
     def forward(self, x):
+        '''
+        Forward pass
+        '''
         x = x.reshape(-1)
         for layer in self.layers:
             x = layer.forward(x)
         return x
 
     def __call__(self, x):
+        '''
+        The callback for showing board
+        '''
         x = self.forward(x)
         return int(np.argmax(x))
 
     def mutate(self, mutation_rate=0.1):
+        '''
+        Mutate all layers
+        '''
         for layer in self.layers:
             layer.mutate(mutation_rate=mutation_rate)
         
     def save(self, location):
+        '''
+        Save to file
+        '''
         pickle.dump(self, open(location, 'wb'))
 
     @staticmethod
     def load(location):
+        '''
+        Load layers from files
+        '''
         return pickle.load(open(location, 'rb'))
