@@ -7,7 +7,7 @@ import numpy as np
 import copy 
 import tqdm
 
-total_generations = 1000
+total_generations = 10
 pop_size = 50
 mutation_rate = 2
 num_surviving = 10
@@ -53,7 +53,7 @@ best = []
 for generation in tqdm.tqdm(range(total_generations)):
     
     # Reduce mutation rate after 500 iterations
-    if generation == 500:
+    if generation == total_generations / 2:
         mutation_rate = mutation_rate / 2
     
     # Mutate all models

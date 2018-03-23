@@ -32,9 +32,9 @@ class _Interface():
 
     def _init_callback(self):
         # Replace any "None" callbacks with human input
-        for callback in self.inputCallback:
+        for idx, callback in enumerate(self.inputCallback):
             if callback is None:
-                callback = lambda x: int(input()) - 1
+                self.inputCallback[idx] = lambda x: int(input()) - 1
 
     def __iter__(self):
         '''
