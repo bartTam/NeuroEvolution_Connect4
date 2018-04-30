@@ -1,5 +1,6 @@
 from network import Network
 from connect_4 import Connect_4
+from random import uniform, random
 
 import os
 from itertools import combinations
@@ -8,8 +9,8 @@ import copy
 import tqdm
 import multiprocessing.dummy as multiprocessing
 
-total_generations = 500
-pop_size = 50
+total_generations = 1000
+pop_size = 100
 mutation_rate = 1e-5
 num_surviving = 5
 
@@ -20,7 +21,9 @@ def find_winner(population, scoreboard):
         winner = game.run_game()
         if winner == 0:
             scoreboard[p1] += 1
+            scoreboard[p2] -= 1
         if winner == 1:
+            scoreboard[p1] -= 1
             scoreboard[p2] += 1
     return run
 
@@ -53,12 +56,10 @@ best = []
 # Iterate over all generations
 for generation in tqdm.tqdm(range(total_generations)):
     
-    # Reduce mutation rate after 500 iterations
-    if generation == total_generations / 2:
-        mutation_rate = mutation_rate / 2
-    
-    # Mutate all models
-    list(map(lambda x: x.mutate(mutation_rate=mutation_rate), population))
+    # Mutate some of the models
+    for net in population:
+        if random() > .5:
+            net.mutate(mutation_rate=mutation_rate)
 
     # Score best models
     scores = rate(population)
@@ -72,6 +73,7 @@ for generation in tqdm.tqdm(range(total_generations)):
         num_copies = pop_size // num_surviving
         copies = [copy.deepcopy(network) for _ in range(num_copies)]
         population.extend(copies)
+        population.extend([Network() for _ in range(10)])
 
 # Save the best models
 if not os.path.exists("log"):

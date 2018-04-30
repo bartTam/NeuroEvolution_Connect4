@@ -34,8 +34,7 @@ class Layer(object):
 class Network(object):
     def __init__(self):
         # The layers of the MLP
-        self.layers = [Layer(42, 35), Layer(35, 30), Layer(30, 25), Layer(25, 20), 
-                Layer(20, 15), Layer(15, 7)]
+        self.layers = [Layer(42, 32), Layer(32, 22), Layer(22, 7)]
     
     def forward(self, x):
         '''
