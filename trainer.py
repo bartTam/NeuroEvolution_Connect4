@@ -6,11 +6,12 @@ from itertools import combinations
 import numpy as np
 import copy 
 import tqdm
+import multiprocessing.dummy as multiprocessing
 
-total_generations = 10
+total_generations = 500
 pop_size = 50
-mutation_rate = 2
-num_surviving = 10
+mutation_rate = 1e-5
+num_surviving = 5
 
 def find_winner(population, scoreboard):
     def run(players):

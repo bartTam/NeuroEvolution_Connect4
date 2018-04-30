@@ -57,17 +57,18 @@ class _Interface():
         '''
         Update the visual of the board
         '''
-        print_output = {-1:'_', 0:'X', 1:'O'}
+        if self.printing:
+            print_output = {-1:'_', 0:'X', 1:'O'}
 
-        # Print each row
-        self.print()
-        for row in board:
-            for value in row:
-                self.print(print_output[value], end='')
+            # Print each row
             self.print()
-        for i in range(board.shape[1]):
-            self.print(i + 1, end='')
-        self.print()
+            for row in board:
+                for value in row:
+                    self.print(print_output[value], end='')
+                self.print()
+            for i in range(board.shape[1]):
+                self.print(i + 1, end='')
+            self.print()
 
 class _Pygame_GUI(_Interface):
     default_window_size = (1000, 600)
